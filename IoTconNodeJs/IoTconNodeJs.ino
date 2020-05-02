@@ -1,7 +1,10 @@
 const byte DATA_MAX_SIZE = 16;
 char data[DATA_MAX_SIZE]; // guarda los datos recibidos
+const int analogPort = A3;
+double voltaje = 0;
+double temp = 0;
 
-int led1 = 1;
+int ledSw = 1;
 
 int led_inicial = 7;
 
@@ -9,35 +12,30 @@ void setup() {
   // put your setup code here, to run once:
 
   Serial.begin(9600); // comienza la comunicacion con el serial, siempre se coloca
-
   pinMode(led_inicial, OUTPUT);
   digitalWrite(led_inicial, HIGH);
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-  digitalWrite(led_inicial, led1);
-  Serial.println("Hola");
+  digitalWrite(led_inicial, ledSw);
+  voltaje= analogRead(analogPort)*(1024/1023.0)*5000.0/1023.0;
+  temp = voltaje*0.1;
+  //Serial.println("Hola");
   datosRecibidos();
-  delay(200);
+  delay(2000);
+  Serial.print("$VO1$");
+  Serial.print(temp);
+  Serial.print("$VO1$");
   if (!strcmp(data, "on")) {
-    led1 = 1;
+    ledSw = 1;
   } else if (!strcmp(data, "off")) {
-    led1 = 0;
+    ledSw = 0;
   } else {
-    Serial.println("invalido");
+    //Serial.println("invalido");
   }
-  /*
-    if( !strcmp(data,"on") || !strcmp(data,"off")){
-    if(!strcmp(data,"on")){
-      led1 = 1;
-    }else{
-      led1 = 0;
-    }
-    }else{
-    Serial.println("invalido");
-    }*/
-  Serial.println(led1);
+  Serial.print("-%-$VI2$");
+  Serial.print(ledSw);
+  Serial.println("$VI2$");
 }
 
 
@@ -67,8 +65,8 @@ void datosRecibidos() {
     }
   }
   // si llega a este punto significa que se paso
-  Serial.println("error: mensaje incompleto");
-  Serial.println(data);
+  //Serial.println("error: mensaje incompleto");
+  //Serial.println(data);
   memset(data, 32, sizeof(data));
 
 }
